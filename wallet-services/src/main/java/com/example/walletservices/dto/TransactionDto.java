@@ -4,6 +4,8 @@ import com.example.walletservices.model.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 public class TransactionDto {
@@ -12,6 +14,6 @@ public class TransactionDto {
     private String transactionId;
     private TransactionType transactionType;
     private Double amount;
-    private String timestamp;
+    private LocalDateTime timestamp;
     private String description;
 }

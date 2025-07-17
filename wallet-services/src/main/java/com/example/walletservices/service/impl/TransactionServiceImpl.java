@@ -3,6 +3,7 @@ package com.example.walletservices.service.impl;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -98,10 +99,58 @@ public class TransactionServiceImpl implements TransactionService {
             originalTransaction.getTransactionType() == TransactionType.DEPOSIT ?
                 TransactionType.WITHDRAWAL : TransactionType.DEPOSIT,
             originalTransaction.getAmount(),
-            LocalDateTime.now().toString(),
+            LocalDateTime.now(),
             "Reversal of transaction: " + originalTransaction.getTransactionId()
         );
         
         return createTransaction(reversalDto);
+    }
+
+    @Override
+    public Transaction transferBetweenAccounts(Integer fromAccountId, Integer toAccountId, Double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Transfer amount must be positive");
+        }
+    
+        var sourceAccount = ACCOUNT_REPOSITORY.findById(fromAccountId)
+                .orElseThrow(() -> new RuntimeException("Source account not found"));
+        var targetAccount = ACCOUNT_REPOSITORY.findById(toAccountId)
+                .orElseThrow(() -> new RuntimeException("Target account not found"));
+
+        // Verify accounts belong to the same user
+        if (sourceAccount.getUser() == null || targetAccount.getUser() == null ||
+            !sourceAccount.getUser().getId().equals(targetAccount.getUser().getId())) {
+            throw new IllegalStateException("Cannot transfer between accounts of different users or accounts without users");
+        }
+    
+        // Check sufficient balance
+        Double sourceBalance = calculateBalance(fromAccountId);
+        if (sourceBalance < amount) {
+            throw new IllegalStateException("Insufficient balance for transfer");
+        }
+    
+        // Create withdrawal from source account
+        TransactionDto withdrawalDto = new TransactionDto(
+            sourceAccount.getUser().getId(),
+            fromAccountId,
+            UUID.randomUUID().toString(),
+            TransactionType.WITHDRAWAL,
+            amount,
+            LocalDateTime.now(),
+            "Transfer to account " + toAccountId
+        );
+        createTransaction(withdrawalDto);
+    
+        // Create deposit to target account
+        TransactionDto depositDto = new TransactionDto(
+            sourceAccount.getUser().getId(),
+            toAccountId,
+            UUID.randomUUID().toString(),
+            TransactionType.DEPOSIT,
+            amount,
+            LocalDateTime.now(),
+            "Transfer from account " + fromAccountId
+        );
+        return createTransaction(depositDto);
     }
 }

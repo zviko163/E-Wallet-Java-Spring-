@@ -1,17 +1,24 @@
 package com.example.walletservices.controller;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.example.walletservices.dto.TransactionDto;
 import com.example.walletservices.model.Transaction;
 import com.example.walletservices.model.TransactionType;
-import com.example.walletservices.repository.TransactionRepository;
 import com.example.walletservices.service.TransactionService;
+
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -54,6 +61,19 @@ public class TransactionController {
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/transfer")
+    public ResponseEntity<Transaction> transferBetweenAccounts(
+            @RequestParam Integer fromAccountId,
+            @RequestParam Integer toAccountId,
+            @RequestParam Double amount) {
+        try {
+            Transaction transaction = TRANSACTION_SERVICE.transferBetweenAccounts(fromAccountId, toAccountId, amount);
+            return ResponseEntity.ok(transaction);
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return ResponseEntity.badRequest().build();
         }
     }

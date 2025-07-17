@@ -14,4 +14,5 @@ public interface TransactionService {
     Transaction getTransactionById(String transactionId);
     List<Transaction> findByTransactionTypeAndAccount_Id(TransactionType type, Integer accountId);
     Transaction reverseTransaction(String transactionId);
+    Transaction transferBetweenAccounts(Integer fromAccountId, Integer toAccountId, Double amount);
 }

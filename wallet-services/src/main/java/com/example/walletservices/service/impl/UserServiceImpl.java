@@ -1,5 +1,12 @@
 package com.example.walletservices.service.impl;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Objects;
+
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
+
 import com.example.walletservices.dto.LoginRequest;
 import com.example.walletservices.dto.RegistrationDto;
 import com.example.walletservices.model.Account;
@@ -8,13 +15,8 @@ import com.example.walletservices.model.User;
 import com.example.walletservices.repository.AccountRepository;
 import com.example.walletservices.repository.UserRepository;
 import com.example.walletservices.service.UserService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
@@ -49,8 +51,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User addAccount(Integer userId, AccountType accountType) {
-        var user = USER_REPOSITORY.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        var user = USER_REPOSITORY.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Check if user already has an account of this type
+        boolean hasAccountType = user.getAccounts().stream()
+                .anyMatch(account -> account.getAccountType() == accountType);
+        
+        if (hasAccountType) {
+            throw new IllegalStateException("User already has an account of type: " + accountType);
+        }
+
         Account account = new Account();
+        account.setUser(user);
         account.setAccountType(accountType);
         account.setCredit(0.0);
         account.setDebit(0.0);
