@@ -1,4 +1,4 @@
-package co.zw.logarithm.coverlinkonboarding.exceptions;
+package com.example.walletservices.exceptions;
 
- interface ApiSubError {
+interface ApiSubError {
 }

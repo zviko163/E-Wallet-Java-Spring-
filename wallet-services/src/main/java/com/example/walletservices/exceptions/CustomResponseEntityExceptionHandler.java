@@ -1,5 +1,4 @@
-package co.zw.logarithm.coverlinkonboarding.exceptions;
-
+package com.example.walletservices.exceptions;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,10 +15,12 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import javax.persistence.EntityNotFoundException;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.ValidationException;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.ValidationException;
+
+import java.security.InvalidParameterException;
 import java.util.Locale;
 
 @Slf4j
@@ -75,29 +76,6 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         return buildResponseEntity(apiError);
     }
 
-    @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST.value());
-        apiError.setMessage("Invalid input");
-        apiError.setDebugMessage(ex.getLocalizedMessage());
-        return buildResponseEntity(apiError);
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST.value());
-
-        String message = "";
-        for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
-            message = fieldError.getDefaultMessage();
-
-        }
-
-        apiError.setMessage(message);
-        apiError.setDebugMessage(ex.getMessage());
-
-        return buildResponseEntity(apiError);
-    }
 
 
     @ExceptionHandler(DataIntegrityViolationException.class)
@@ -156,6 +134,17 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         return buildResponseEntity(apiError);
     }
 
+
+    @ExceptionHandler(IllegalStateException.class)
+    protected ResponseEntity<Object> handleIllegalStateException(
+            IllegalStateException ex) {
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST.value());
+        apiError.setMessage(ex.getLocalizedMessage());
+        apiError.setDebugMessage(ex.getMessage());
+        return buildResponseEntity(apiError);
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     protected ResponseEntity<Object> handleIllegalArgumentException(
             IllegalArgumentException ex) {
@@ -171,7 +160,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
             RuntimeException ex) {
 
         ApiError apiError = new ApiError(HttpStatus.EXPECTATION_FAILED.value());
-        if (ex.getCause() != null && ex.getCause().getCause() instanceof javax.validation.ConstraintViolationException) {
+        if (ex.getCause() != null && ex.getCause().getCause() instanceof ConstraintViolationException) {
 
             for (ConstraintViolation violation : ((ConstraintViolationException) ex.getCause().getCause()).getConstraintViolations()) {
                 apiError.setMessage(violation.getMessage());

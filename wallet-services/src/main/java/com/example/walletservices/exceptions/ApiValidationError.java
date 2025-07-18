@@ -1,4 +1,4 @@
-package co.zw.logarithm.coverlinkonboarding.exceptions;
+package com.example.walletservices.exceptions;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
