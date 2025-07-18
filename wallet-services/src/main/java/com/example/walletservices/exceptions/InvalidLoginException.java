@@ -1,4 +1,4 @@
-package co.zw.logarithm.coverlinkonboarding.exceptions;
+package com.example.walletservices.exceptions;
 
 public class InvalidLoginException extends RuntimeException {
     public InvalidLoginException(String exception) {
