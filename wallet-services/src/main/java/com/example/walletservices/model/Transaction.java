@@ -1,17 +1,19 @@
 package com.example.walletservices.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Data
 @Table(name = "transactions")
+@Getter
+@Setter
+@ToString(exclude = "account") // Exclude account from toString
+@EqualsAndHashCode(exclude = "account") // Exclude account from equals/hashCode
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,5 +29,6 @@ public class Transaction {
 
     @ManyToOne
     @JoinColumn(name = "account_id", nullable = false)
-    private Account account; // Reference to the account associated with the transaction
+    @JsonManagedReference // Add this annotation
+    private Account account;
 }

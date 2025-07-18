@@ -2,8 +2,10 @@ package com.example.walletservices.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+import com.example.walletservices.dto.UserUpdateDto;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
@@ -72,4 +74,30 @@ public class UserServiceImpl implements UserService {
         user.getAccounts().add(account);
         return USER_REPOSITORY.save(user);
     }
+
+    @Override
+    public List<User> findAll() {
+        return USER_REPOSITORY.findAll();
+    }
+
+    @Override
+    public User updateUser(Integer id, UserUpdateDto user) {
+        User existingUser = USER_REPOSITORY.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Update user details
+        existingUser.setName(user.getName());
+        existingUser.setEmail(user.getEmail());
+        existingUser.setPassword(user.getPassword());
+        existingUser.setPhoneNumber(user.getPhoneNumber());
+
+        return USER_REPOSITORY.save(existingUser);
+    }
+
+    @Override
+    public User findById(Integer id) {
+        return USER_REPOSITORY.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
 }

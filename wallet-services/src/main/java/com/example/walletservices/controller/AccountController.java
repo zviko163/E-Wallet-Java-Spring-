@@ -1,13 +1,12 @@
 package com.example.walletservices.controller;
 
+import com.example.walletservices.model.Account;
 import com.example.walletservices.repository.AccountRepository;
 import com.example.walletservices.service.AccountService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -25,5 +24,10 @@ public class AccountController {
     public String deleteAccount(Integer accountId) {
         accountService.deleteAccount(accountId);
         return "Account with ID " + accountId + " has been deleted successfully.";
+    }
+
+    @GetMapping("/getAccount/{accountId}")
+    public ResponseEntity<Account> getAccount(@PathVariable Integer accountId) {
+        return ResponseEntity.of(accountRepository.findById(accountId));
     }
 }

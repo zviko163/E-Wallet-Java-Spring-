@@ -2,6 +2,7 @@ package com.example.walletservices.model;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -11,16 +12,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Data
 @Table(name = "accounts")
+@Getter
+@Setter
+@ToString(exclude = "user") // Exclude user from toString
+@EqualsAndHashCode(exclude = "user") // Exclude user from equals/hashCode
 public class Account {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
@@ -34,7 +36,8 @@ public class Account {
     
     private LocalDateTime createdAt;
 
-    @ManyToOne(fetch = FetchType.EAGER)  // Change from LAZY to EAGER
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
+    @JsonBackReference // Add this annotation
     private User user;
 }
