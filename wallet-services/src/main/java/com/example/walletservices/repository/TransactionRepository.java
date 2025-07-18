@@ -12,10 +12,6 @@ import java.util.Optional;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
-    // Additional query methods can be defined here if needed
-    // For example, to find transactions by user ID or account ID
-    // List<Transaction> findByUserId(Integer userId);
-//    List<Transaction> findByType(String type);
     List<Transaction> findByAccountId(Integer accountId);
     Optional<Transaction> findByTransactionId(String transactionId);
     List<Transaction> findByTransactionTypeAndAccount_Id(TransactionType type, Integer accountId);

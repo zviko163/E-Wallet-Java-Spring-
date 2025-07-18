@@ -30,4 +30,10 @@ public class AccountController {
     public ResponseEntity<Account> getAccount(@PathVariable Integer accountId) {
         return ResponseEntity.of(accountRepository.findById(accountId));
     }
+
+    @PutMapping("/freezeAccount/{accountId}")
+    public void freezeAccount(@PathVariable Integer accountId) {
+        accountRepository.freezeAccount(accountId);
+        System.out.println("Account with ID " + accountId + " has been freezed successfully.");
+    }
 }
