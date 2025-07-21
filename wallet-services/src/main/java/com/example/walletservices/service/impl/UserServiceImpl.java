@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import com.example.walletservices.dto.UserUpdateDto;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.walletservices.dto.LoginRequest;
@@ -25,13 +26,17 @@ import lombok.RequiredArgsConstructor;
 public class UserServiceImpl implements UserService {
     private final UserRepository USER_REPOSITORY;
     private final AccountRepository ACCOUNT_REPOSITORY;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public User login(LoginRequest loginRequest) {
         var user = USER_REPOSITORY.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
-        if (!Objects.equals(user.getPassword(), loginRequest.getPassword())) {
-            throw new DataIntegrityViolationException("Invalid password");
+
+        // checking for password matching using passwordEncoder.matches method
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+           throw new DataIntegrityViolationException("Password does not match");
         }
+
         return user;
     }
 
@@ -44,7 +49,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setName(registrationDto.getName());
         user.setEmail(registrationDto.getEmail());
-        user.setPassword(registrationDto.getPassword());
+        user.setPassword(passwordEncoder.encode(registrationDto.getPassword()));
         user.setPhoneNumber(registrationDto.getPhoneNumber());
         user.setAccounts(new ArrayList<>());
 
@@ -88,7 +93,7 @@ public class UserServiceImpl implements UserService {
         // Update user details
         existingUser.setName(user.getName());
         existingUser.setEmail(user.getEmail());
-        existingUser.setPassword(user.getPassword());
+        existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
         existingUser.setPhoneNumber(user.getPhoneNumber());
 
         return USER_REPOSITORY.save(existingUser);
