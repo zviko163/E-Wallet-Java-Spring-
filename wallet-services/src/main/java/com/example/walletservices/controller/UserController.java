@@ -3,6 +3,7 @@ package com.example.walletservices.controller;
 import com.example.walletservices.config.CustomUserDetailsService;
 import com.example.walletservices.dto.LoginRequest;
 import com.example.walletservices.dto.RegistrationDto;
+import com.example.walletservices.dto.UserResponseDto;
 import com.example.walletservices.dto.UserUpdateDto;
 import com.example.walletservices.model.AccountType;
 import com.example.walletservices.model.User;
@@ -57,6 +58,12 @@ public class UserController {
             response.put("token", token);
             response.put("user", user);
 
+            UserResponseDto userResponseDto = new UserResponseDto(
+                    user.getId(),
+                    user.getEmail(),
+                    user.getName(),
+                    user.getAccounts()
+            );
             return ResponseEntity.ok(response);
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
