@@ -39,6 +39,8 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
             // 1. Authenticate user
+            System.out.println("Trying to authenticate user: " + loginRequest.getEmail());
+            System.out.println("Trying to authenticate user: " + loginRequest.getPassword());
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.getEmail(),
@@ -46,17 +48,20 @@ public class UserController {
                     )
             );
 
+            System.out.println("Authentication Successful");
+
             // 2. Load user and generate token
             UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getEmail());
+
+            // DEBUG: Check if userDetails is null
+            System.out.println("User found: " + userDetails);  // Should not be null
+            System.out.println("Stored password: " + userDetails.getPassword()); // Must be encoded
+
+
             String token = jwtUtil.generateToken(String.valueOf(userDetails));
 
             // 3. Fetch full user data (optional)
             User user = USER_SERVICE.findByEmail(userDetails.getUsername());
-
-            // 4. Return user + token in a structured response
-            Map<String, Object> response = new HashMap<>();
-            response.put("token", token);
-            response.put("user", user);
 
             UserResponseDto userResponseDto = new UserResponseDto(
                     user.getId(),
@@ -64,6 +69,11 @@ public class UserController {
                     user.getName(),
                     user.getAccounts()
             );
+            // 4. Return user + token in a structured response
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", token);
+            response.put("user", userResponseDto);
+
             return ResponseEntity.ok(response);
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
