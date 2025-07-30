@@ -1,9 +1,9 @@
 package com.example.walletservices.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+@Getter
+@Setter
 @AllArgsConstructor
 @Data
 public class LoginRequest {
