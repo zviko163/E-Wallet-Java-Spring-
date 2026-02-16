@@ -18,10 +18,10 @@ ARG PROXY_SET=false
 ARG PROXY_HOST=
 ARG PROXY_PORT=
 COPY src ./src
-RUN mvn -B clean package \
-        -DproxySet=${PROXY_SET} \
-        -DproxyHost=${PROXY_HOST} \
-        -DproxyPort=${PROXY_PORT}
+RUN mvn -B clean package -DskipTests \
+    -DproxySet=${PROXY_SET} \
+    -DproxyHost=${PROXY_HOST} \
+    -DproxyPort=${PROXY_PORT}
 #############################################################################################
 #############################################################################################
 ###                Optional stage where Docker is running Sonar analysis                  ###
