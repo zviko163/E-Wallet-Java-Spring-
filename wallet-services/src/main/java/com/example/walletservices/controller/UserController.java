@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:5173")
+//@CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/users")
